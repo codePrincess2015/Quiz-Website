@@ -1,0 +1,15 @@
+package quiz;
+
+import java.util.ArrayList;
+
+public class Answer{
+	ArrayList<String> possibleAnswers = new ArrayList<String>();
+	
+	public void addPossibleAnswer(String answer ){
+		possibleAnswers.add(answer);
+	}
+	public ArrayList<String> getPossibleAnswers(){
+		return possibleAnswers;
+	}
+	
+}

@@ -1,0 +1,39 @@
+package quiz;
+
+import java.sql.*;
+
+public class QuizConnection{
+	private Connection con;
+	public QuizConnection(){
+		try { 
+			Class.forName("com.mysql.jdbc.Driver"); 
+
+			con = DriverManager.getConnection 
+					( "jdbc:mysql://" + MyDBInfo.MYSQL_DATABASE_SERVER, MyDBInfo.MYSQL_USERNAME ,MyDBInfo.MYSQL_PASSWORD); 
+		} catch (SQLException e) { 
+			e.printStackTrace(); 
+		} 
+		catch (ClassNotFoundException e) { 
+			e.printStackTrace(); 
+		} 
+	}
+	public Statement returnStatement(){
+		Statement stmt = null;
+		try {
+			 stmt = con.createStatement();
+			 stmt.executeQuery("USE " + MyDBInfo.MYSQL_DATABASE_NAME); 	
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return stmt;
+	}
+	public void closeConnection(){
+		try {
+			con.close();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+}

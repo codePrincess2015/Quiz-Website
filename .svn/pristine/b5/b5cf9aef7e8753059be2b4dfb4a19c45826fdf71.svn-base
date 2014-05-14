@@ -1,0 +1,90 @@
+package quiz;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.StringTokenizer;
+
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
+/**
+ * Servlet implementation class GradeServlet
+ */
+@WebServlet("/GradeServlet")
+public class GradeServlet extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+
+	/**
+	 * @see HttpServlet#HttpServlet()
+	 */
+	public GradeServlet() {
+		super();
+		// TODO Auto-generated constructor stub
+	}
+
+	/**
+	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
+	 */
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		// TODO Auto-generated method stub
+	}
+
+	/**
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
+	 */
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		HttpSession session = request.getSession();
+		String immediateCorrection = (String) session.getAttribute("imCor");
+		Quiz quiz = (Quiz) session.getAttribute("quiz");
+		ArrayList<QuizItem> quizItems = quiz.getQuizItems();
+		ArrayList<String> userAnswerArray;
+		int index = 0;
+		int score = 0;
+		if(immediateCorrection.equals("yes")){
+			if(session.getAttribute("display").equals("onePage")){
+				Enumeration<String> userAnswers = request.getParameterNames();
+				while(userAnswers.hasMoreElements()){
+					ArrayList<Answer> answers = quizItems.get(index).getAnswersArray();
+					userAnswerArray = new ArrayList<String>();
+					String answer = request.getParameter(userAnswers.nextElement());
+					StringTokenizer tokenizer = new StringTokenizer(answer,",");
+					while(tokenizer.hasMoreTokens()){
+						String token = tokenizer.nextToken();
+						userAnswerArray.add(token);
+					}
+					score += quiz.grade(answers,userAnswerArray);
+					index++;
+				}
+			
+			}
+			else{
+				String a = (String) request.getParameter((String)session.getAttribute("quizItemNumber"));
+				ArrayList<String>userAnswers = (ArrayList<String>) session.getAttribute("userAnswers");
+				userAnswers.add(a);
+				System.out.println(userAnswers);
+				for(int i = 0; i < quizItems.size(); i++){
+					String answer = userAnswers.get(i);
+					ArrayList<Answer> answers = quizItems.get(index).getAnswersArray();
+					userAnswerArray = new ArrayList<String>();
+					StringTokenizer tokenizer = new StringTokenizer(answer,",");
+					while(tokenizer.hasMoreTokens()){
+						String token = tokenizer.nextToken();
+						userAnswerArray.add(token);
+					}
+					score += quiz.grade(answers,userAnswerArray);
+					index++;
+				}
+				
+			}
+		}
+
+
+	}
+
+}

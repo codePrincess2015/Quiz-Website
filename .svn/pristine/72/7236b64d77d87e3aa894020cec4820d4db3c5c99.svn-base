@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Welcome to Quiztopia!</title>
+</head>
+<body>
+<h1>Welcome to Quiztopia!</h1>
+
+<form action="LoginServlet" method="post">
+<p>Please log in.</p>
+<p>User Name: <input type="text" name="username" ></p>
+<p>Password: <input type="text" name="password">
+<input type="submit" value="Login"></p>
+</form> 
+<p>
+<a href="CreateAccount.jsp">Create Account</a>
+</p>
+</body>
+</html>

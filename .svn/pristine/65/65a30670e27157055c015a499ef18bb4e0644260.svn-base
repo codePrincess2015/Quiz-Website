@@ -1,0 +1,92 @@
+package quiz;
+
+import java.io.IOException;
+import java.sql.ResultSet;
+import java.util.ArrayList;
+import java.util.Set;
+
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
+/**
+ * Servlet implementation class LoginServlet
+ */
+@WebServlet("/LoginServlet")
+public class LoginServlet extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+       
+    /**
+     * @see HttpServlet#HttpServlet()
+     */
+    public LoginServlet() {
+        super();
+        // TODO Auto-generated constructor stub
+    }
+
+	/**
+	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
+	 */
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	}
+
+	/**
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
+	 */
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		ServletContext context = getServletContext();
+		AccountManager manager = (AccountManager) context.getAttribute("accountManager");
+		String name = request.getParameter("username");
+		String attempt = request.getParameter("password");
+		
+		System.out.println("name = " + name); ///
+		System.out.println("attempt = " + attempt); ///
+		
+		RequestDispatcher rd = request.getRequestDispatcher("HomePage.jsp");
+		if (manager.passwordMatches(name, attempt)) {
+			System.out.println("Password Matches"); ///
+			HttpSession session = request.getSession();
+			UserProfile profile;
+			if (session.getAttribute("userProfile") == null) {
+				profile = createUserProfile(request, name);
+				session.setAttribute("userProfile", profile);
+			}
+			profile = (UserProfile) session.getAttribute("userProfile");
+			rd.forward(request, response);
+		} else {
+			System.out.println("hashedAttempt = " + AccountManager.computePasswordHash(attempt)); ///
+			rd = request.getRequestDispatcher("TryAgain.jsp");
+			rd.forward(request, response);
+		}
+	}
+	
+	private UserProfile createUserProfile(HttpServletRequest request, String name) {
+    	UserMySQLAccess con = new UserMySQLAccess();
+    	//FriendsConnection friendsCon = new FriendsConnection();
+    		// FriendsConnection methods have been moved to UserMySQLAccess
+    	
+    	ResultSet userResultSet = con.getUser(name);
+    	String password = con.getHashedPassword(userResultSet);
+    	boolean tookPracticeQuiz = con.hasTakenPracticeQuiz(userResultSet);
+    	int numberQuizzesCreated = con.getQuizzesCreated(userResultSet);
+    	int numberQuizzesTaken = con.getQuizzesTaken(userResultSet);
+    	Set<String> friends = con.getUserFriends(name); ///
+    	ArrayList<String> quizzesTaken = con.getQuizHistory(name);
+    	ArrayList<String> quizzesCreated = con.getQuizzesCreatedHistory(name);
+    	
+    	ArrayList<String> achievements = null; // temporary until stub of getAchievements is implemented
+    	//ArrayList<String> achievements = con.getAchievements(userResultSet);
+    	
+    	boolean admin = con.getAdmin(name);
+    	int rank = con.getRank(name);
+  
+    	//return null; // temporary
+    	return new UserProfile(name, password, numberQuizzesCreated, numberQuizzesTaken, tookPracticeQuiz, friends, quizzesTaken, quizzesCreated, achievements, admin, rank);
+    }
+
+}

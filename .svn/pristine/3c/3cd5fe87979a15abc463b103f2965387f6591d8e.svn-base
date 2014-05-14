@@ -1,0 +1,164 @@
+<%@ page import="java.sql.*,quiz.UserMySQLAccess,quiz.UserProfile,quiz.UserMySQLAccess,java.util.ArrayList,quiz.Newsfeed" %>
+<%@ page language="java" contentType="text/html; charset=ISO-8859-1"
+    pageEncoding="ISO-8859-1"%>
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>Welcome to Quiztopia!</title>
+</head>
+<body>
+<%
+	String currentUser = ((UserProfile)session.getAttribute("userProfile")).getName();
+
+%>
+<h1>Welcome to Quiztopia,<%=" "+ currentUser %>!</h1>
+<nav>
+<a href="HomePage.jsp">Home</a> |
+<a href="CreateQuiz.jsp">Create a Quiz</a> |
+<a href="QuizCatalog.jsp">All Quizzes</a> |
+<a href="UserCatalog.jsp">Users</a> |
+<a href="/jquery/">Rankings</a> |
+<a href="/">Messages</a> |
+<a href="/">My Account</a>
+</nav>
+<%
+	UserMySQLAccess con = new UserMySQLAccess();
+	ResultSet rs = con.getNewsfeed();
+	ArrayList<Newsfeed> myCreatingActivity = new ArrayList<Newsfeed>();
+	ArrayList<Newsfeed> myTakingActivity = new ArrayList<Newsfeed>();
+	ArrayList<Newsfeed> myAchievements = new ArrayList<Newsfeed>();
+	ArrayList<Newsfeed> myFriendsActivity = new ArrayList<Newsfeed>();
+	ArrayList<Newsfeed> recentlyCreatedQuizzes = new ArrayList<Newsfeed>();
+	while(rs.next()){
+		String type = rs.getString("type");
+		String username = rs.getString("username");
+		String details = rs.getString("details");
+		Newsfeed news = new Newsfeed(username,type,details); ;
+		if(type.equals("creation")){
+			if(username.equals(currentUser)){
+				myCreatingActivity.add(news);
+				
+			}
+			else if(con.areFriends(currentUser,username)) {
+				myFriendsActivity.add(news);
+			}
+			recentlyCreatedQuizzes.add(news);
+		}
+		else if(type.equals("taking")){
+			if(username.equals(currentUser)){
+				myTakingActivity.add(news);
+				
+			}
+			else if(con.areFriends(currentUser,username)) {
+				myFriendsActivity.add(news);
+			}
+		}
+		else if(type.equals("achievement")){
+			if(username.equals(currentUser)){
+				myAchievements.add(news);
+				
+			}
+			else if(con.areFriends(currentUser,username)) {
+				myFriendsActivity.add(news);
+			}
+		}
+	
+		
+	}
+	con.closeConnection();
+
+%>
+<h3>Announcements</h3>
+
+<h3>My Quiz Creation Activity</h3>
+<ul>
+<%
+	for(int i = 0; i < myCreatingActivity.size(); i++){
+		Newsfeed news = myCreatingActivity.get(i);
+		String quizName = news.getDetails();
+		%>
+			<li> I created <a href=<%="QuizPage.jsp?id=" +quizName %>> <%=quizName%> </a></li>
+		<%
+	}
+
+%>
+</ul>
+<h3>My Quiz Taking Activity</h3>
+<ul>
+<%
+	for(int i = 0; i < myTakingActivity.size(); i++){
+		Newsfeed news = myTakingActivity.get(i);
+		String quizName = news.getDetails();
+		%>
+			<li> I took <a href=<%="QuizPage.jsp?id=" +quizName %>> <%=quizName%> </a></li>
+		<%
+	}
+
+%>
+</ul>
+<h3>My Achievements</h3>
+<ul>
+<%
+	for(int i = 0; i < myAchievements.size(); i++){
+		Newsfeed news = myAchievements.get(i);
+		String quizName = news.getDetails();
+		%>
+			<li> I took <a href=<%="QuizPage.jsp?id=" +quizName %>> <%=quizName%> </a></li>
+		<%
+	}
+
+%>
+</ul>
+
+<h3>My Friends' Activity</h3>
+<ul>
+<%
+	for(int i = 0; i < myFriendsActivity.size(); i++){
+		Newsfeed news = myFriendsActivity.get(i);
+		String details = news.getDetails();
+		String type = news.getType();
+		String username = news.getUser();
+		if(type.equals("taking")){
+		%>
+			<li> <a href=<%=UserProfile.getURL(username)%>> </a> <%=username%> took <% %> <a href=<%="QuizPage.jsp?id=" +details %>> <%=details%> </a></li>
+		<%
+		}
+		else if(type.equals("creating")){
+			%>
+				<li> <a href=<%=UserProfile.getURL(username)%>></a> <%=username%> created <% %><a href=<%="QuizPage.jsp?id=" +details %>> <%=details%> </a></li>
+			<%
+		}
+		else if(type.equals("achievement")){
+			%>
+				<li> <a href=<%=UserProfile.getURL(username)%>> </a> <%=username%> achieved <% %><%=details%> </li>
+			<%
+			}
+	}
+
+%>
+</ul>
+
+<h3>Most Popular Quizzes</h3>
+
+<h3>Recently Created Quizzes</h3>
+<ul>
+<%
+	for(int i = 0; i < recentlyCreatedQuizzes.size(); i++){
+		Newsfeed news = recentlyCreatedQuizzes.get(i);
+		String quizName = news.getDetails();
+		String username = news.getUser();
+		%>
+			<li> <a href=<%=UserProfile.getURL(username)%>> <%=username%></a> created <% %>  <a href=<%="QuizPage.jsp?id=" +quizName %>> <%=quizName%> </a></li>
+		<%
+	}
+
+%>
+</ul>
+
+
+<h3>Notifications</h3>
+
+</body>
+</html>
+

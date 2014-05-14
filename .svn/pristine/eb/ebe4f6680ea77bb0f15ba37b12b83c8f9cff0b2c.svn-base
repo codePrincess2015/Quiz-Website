@@ -1,0 +1,47 @@
+package quiz;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
+import com.mysql.jdbc.Statement;
+
+public class CatConnection{
+	private Connection con;
+	public CatConnection(){
+		try { 
+			Class.forName("com.mysql.jdbc.Driver"); 
+
+			con = DriverManager.getConnection 
+					( "jdbc:mysql://" + MyDBInfo.MYSQL_DATABASE_SERVER, MyDBInfo.MYSQL_USERNAME ,MyDBInfo.MYSQL_PASSWORD); 
+		} catch (SQLException e) { 
+			e.printStackTrace(); 
+		} 
+		catch (ClassNotFoundException e) { 
+			e.printStackTrace(); 
+		} 
+	}
+	public ResultSet returnQuizzes(){
+		ResultSet rs = null;
+		try {
+			Statement stmt = (Statement) con.createStatement(); 
+			stmt.executeQuery("USE " + MyDBInfo.MYSQL_DATABASE_NAME);
+			rs = stmt.executeQuery("SELECT * FROM quizzes");
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} 
+		
+		return rs;
+		
+	}
+	public void closeConnection(){
+		try {
+			con.close();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+}

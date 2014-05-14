@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Submit Success!</title>
+</head>
+<body>
+
+<h1>Welcome to Quiztopia!</h1>
+<nav>
+<a href="HomePage.jsp">Home</a> |
+<a href="CreateQuiz.jsp">Create a Quiz</a> |
+<a href="QuizCatalog.jsp">All Quizzes</a> |
+<a href="UserCatalog.jsp">Users</a> |
+<a href="/jquery/">Rankings</a> |
+<a href="/">Messages</a> |
+<a href="/">My Account</a>
+</nav>
+
+<h1>Submit Success!</h1>
+</body>
+</html>

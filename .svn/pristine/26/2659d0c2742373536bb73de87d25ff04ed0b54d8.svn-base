@@ -1,0 +1,145 @@
+package quiz;
+
+import java.sql.*;
+
+/*
+ * This file is a copy from HW5Part2 which will support access for MySQL requests about the users on our site.
+ */
+
+public class UserMySQLAccess { 
+	/* Instance Variables */
+	static String account = MyDBInfo.MYSQL_USERNAME; 
+	static String password = MyDBInfo.MYSQL_PASSWORD; 
+	static String server = MyDBInfo.MYSQL_DATABASE_SERVER; 
+	static String database = MyDBInfo.MYSQL_DATABASE_NAME; 
+
+	public static Connection con;
+	private static ResultSet rs;
+	private static Statement stmt;
+
+	/* Constants */
+
+
+	public UserMySQLAccess() {
+		try { 
+			Class.forName("com.mysql.jdbc.Driver"); 
+			con = DriverManager.getConnection( "jdbc:mysql://" + server, account ,password);
+			stmt = con.createStatement();
+			stmt.executeQuery("USE " + database); 
+			rs = stmt.executeQuery("SELECT * FROM users");
+		} catch (SQLException e) { 
+			// TODO Auto-generated catch block 
+			e.printStackTrace(); 
+		} 
+		catch (ClassNotFoundException e) { 
+			// TODO Auto-generated catch block 
+			e.printStackTrace(); 
+		} 
+	}
+
+	public ResultSet getResultSet() {
+		return rs;
+	}
+
+	public String getFirstName(ResultSet set) {
+		String result = null;
+		try {
+			result = set.getString("firstName");
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return result;
+	}
+
+	public String getLastName(ResultSet set) {
+		String result = null;
+		try {
+			result = set.getString("lastName");
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return result;
+	}
+
+	public String getImageFile(ResultSet set) {
+		String result = null;
+		try {
+			result = set.getString("imageFile");
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return result;
+	}
+
+	// Returns the row in the users table corresponding to the desired userName (which is unique).
+	public ResultSet getUser(String userName) {
+		ResultSet result = null;
+		try {
+			result = stmt.executeQuery("SELECT * FROM users WHERE userName = \"" + userName + "\"");
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		System.out.println("Result set for user: " + userName + " is " + result + "at UserMySQLAccess line 83");
+		return result;
+	}
+
+	public String getUserName(ResultSet set) {
+		String result = null;
+		try {
+			result = set.getString("userName");
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return result;
+	}
+
+	public String getHashedPassword(ResultSet set) {
+		String result = "test1"; // change back to null for sake of good style
+		System.out.println("set = " + set); ///
+		try {
+			//			System.out.println("Actual hashedPassword = " + set.getString(4));
+			while (set.next()){
+				result = (String) set.getString("hashedPassword"); // TEST try overridden version of getString using colIndex
+				System.out.println("result for hashedPassword = " + result); ///
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return result;
+	}
+
+	public void addUser(String firstName, String lastName, String userName, String hashedPassword) {
+		try {
+			stmt = con.createStatement();
+			stmt.executeUpdate("INSERT INTO users VALUES(\"" + firstName + "\",\"" + lastName + "\",\"" + userName + "\",\"" + hashedPassword + "\"," + 0 + "," + 0 + ")");
+			System.out.println("INSERT INTO users VALUES(\"" + firstName + "\",\"" + lastName + "\",\"" + userName + "\",\"" + hashedPassword + "\"," + 0 + "," + 0 + ")");
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public boolean userNameInUse(String proposedName) {
+		ResultSet result = null;
+		try {
+			result = stmt.executeQuery("SELECT * FROM users WHERE userName = \"" + proposedName + "\"");
+			if (result.next()) {
+				System.out.println("Line 121 in UserMySQLAccess");
+				return true;
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return false;
+	}
+
+	public static void closeConnection() {
+		try {
+			con.close();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+}

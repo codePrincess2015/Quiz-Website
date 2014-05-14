@@ -1,0 +1,33 @@
+<%@ page import="java.sql.*,quiz.UserMySQLAccess,quiz.UserProfile" %>
+<%@ page language="java" contentType="text/html; charset=ISO-8859-1"
+    pageEncoding="ISO-8859-1"%>
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>Messages</title>
+</head>
+<body>
+
+<h1>Compose Message</h1>
+<nav>
+<a href="HomePage.jsp">Home</a> |
+<a href="CreateQuiz.jsp">Create a Quiz</a> |
+<a href="QuizCatalog.jsp">All Quizzes</a> |
+<a href="UserCatalog.jsp">Users</a> |
+<a href="/">My Account</a>
+</nav>
+<br><br>
+
+<form action="ComposeMessageServlet" method="post">
+<input type="text" name="text">
+<br><br>
+Enter Quiz Name(Challenge Only) <input type="text" name="quiz">
+<br><br>
+Recipient <input type="text" name="target">
+<br><br>
+<input type="radio" value="0" name="type">
+<input type="radio" value="1" name="type">
+<input type="radio" value="2" name="type">
+<input type="submit" name="Send">
+</form>

@@ -1,0 +1,114 @@
+package quiz;
+
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
+
+
+public class AchievementsList {
+
+	class Achievement{
+		
+		
+		
+		
+		public boolean checkAchievement(UserProfile profile,int achievementId){
+			switch(achievementId) {
+			case 0: return authorAchieved(profile,0);
+			case 1: return authorAchieved(profile,1);
+			case 2: return authorAchieved(profile,2);
+			case 3: return quizzesAchieved(profile,0);
+			case 4: return highest(profile);
+			case 5: return practice(profile);
+			default: return false;
+			}
+		}
+		
+		private boolean authorAchieved(UserProfile profile,int x){
+			int numCreated = profile.getNumQuizzesCreated();
+			switch(x){
+			case 0: return(numCreated>0);
+			case 1: return(numCreated>4);
+			case 2: return(numCreated>9);
+			default: return false;
+			}
+		}
+		private boolean quizzesAchieved(UserProfile profile,int x){
+			int quizzesTaken = profile.getNumQuizzesTaken();
+			switch(x){
+			case 0: return (quizzesTaken>4);
+			default: return false;
+			}
+		}
+		private boolean highest(UserProfile profile){
+			return profile.getTopScore();
+		}
+		private boolean practice(UserProfile profile){
+			return profile.getNumPracticeQuizzesTaken()>0;
+		}
+		
+	}
+	
+	
+	
+	
+	
+	
+	private static final Map<String,Integer> ID_MAP;
+	static {
+		Map<String,Integer> temp = new HashMap<String,Integer>();
+		temp.put("Amateur Author",0);
+		temp.put("Prolific Author",1);
+		temp.put("Prodigious Author",2);
+		temp.put("Quiz Machine",3);
+		temp.put("I am the Greatest",4);
+		temp.put("Practice Makes Perfect",5);
+		ID_MAP = Collections.unmodifiableMap(temp);
+		
+	}
+	
+	private Set<String> playerAchievements;
+	private Set<Integer> playerAchievementIds;
+	
+	
+	
+	public void setPlayerAchievementsIds(Set<Integer> ids){
+		playerAchievementIds = ids;
+	}
+	
+	public void updatePlayerAchievements(UserProfile profile){
+		//create a Set that contains all achievements that playerAchievements does not contain.
+		Set<Integer> unAchieved = new HashSet<Integer>();
+		unAchieved.addAll(ID_MAP.values());
+		unAchieved.removeAll(playerAchievementIds);
+		//Create iterator of all unachieved achievements.
+		Iterator<Integer> iterator = unAchieved.iterator();
+		while(iterator.hasNext()){
+			updateIndividualAchievement(profile,iterator.next());
+		}
+	}
+	public void addPlayerAchievement(String name){
+		playerAchievements.add(name);
+		playerAchievementIds.add(ID_MAP.get(name));
+	}
+	
+	public void addPlayerAchievement(Set<String> names){
+		Iterator<String> iterator = names.iterator();
+		while(iterator.hasNext()){
+			addPlayerAchievement(iterator.next());
+		}
+	}
+	
+	private void updateIndividualAchievement(UserProfile profile,int achievementId){
+		Achievement achievement = new Achievement();
+		achievement.checkAchievement(profile, achievementId);
+	}
+	
+	
+	public Set<String> getPlayerAchievements(){
+		return playerAchievements;
+	}
+}

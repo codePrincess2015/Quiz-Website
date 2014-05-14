@@ -1,0 +1,624 @@
+package quiz;
+
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
+
+import javax.servlet.http.HttpSession;
+
+import com.mysql.jdbc.Statement;
+
+/*
+ * This file supports access for MySQL requests about the users on our site.
+ */
+
+public class UserMySQLAccess { 
+	/* Instance Variables */
+	static String account = MyDBInfo.MYSQL_USERNAME; 
+	static String password = MyDBInfo.MYSQL_PASSWORD; 
+	static String server = MyDBInfo.MYSQL_DATABASE_SERVER; 
+	static String database = MyDBInfo.MYSQL_DATABASE_NAME; 
+
+	public static Connection con;
+	private static ResultSet rs;
+	private static Statement stmt;
+
+	/* Constants */
+
+
+	public UserMySQLAccess() {
+		try { 
+			Class.forName("com.mysql.jdbc.Driver"); 
+			con = DriverManager.getConnection( "jdbc:mysql://" + server, account ,password);
+			stmt = (Statement) con.createStatement();
+			stmt.executeQuery("USE " + database); 
+			rs = stmt.executeQuery("SELECT * FROM users");
+		} catch (SQLException e) { 
+			// Auto-generated catch block 
+			e.printStackTrace();
+		} 
+		catch (ClassNotFoundException e) { 
+			// Auto-generated catch block 
+			e.printStackTrace(); 
+		} 
+	}
+
+	public ResultSet getResultSet() {
+		ResultSet set = null;
+		try {
+			stmt = (Statement) con.createStatement();
+			stmt.executeQuery("USE " + database);
+			set = stmt.executeQuery("SELECT * FROM users");
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return set;
+	}
+
+	public String getFirstName(ResultSet set) {
+		String result = null;
+		try {
+			result = set.getString("firstName");
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return result;
+	}
+
+	public String getLastName(ResultSet set) {
+		String result = null;
+		try {
+			result = set.getString("lastName");
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return result;
+	}
+
+	public String getImageFile(ResultSet set) {
+		String result = null;
+		try {
+			result = set.getString("imageFile");
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return result;
+	}
+
+	// Returns the row in the users table corresponding to the desired userName (which is unique).
+	public ResultSet getUser(String userName) {
+		ResultSet result = null;
+		try {
+			result = stmt.executeQuery("SELECT * FROM users WHERE userName = \"" + userName + "\"");
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		System.out.println("Result set for user: " + userName + " is " + result + "at UserMySQLAccess line 83");
+		return result;
+	}
+
+	public String getUserName(ResultSet set) {
+		String result = null;
+		try {
+			result = set.getString("userName");
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return result;
+	}
+
+	public String getHashedPassword(ResultSet set) {
+		String result = "test1"; // change back to null for sake of good style
+		System.out.println("set = " + set); ///
+		try {
+			//			System.out.println("Actual hashedPassword = " + set.getString(4));
+			while (set.next()){
+				result = (String) set.getString("hashedPassword"); // TEST try overridden version of getString using colIndex
+				System.out.println("result for hashedPassword = " + result); ///
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return result;
+	}
+
+	public void addUser(String firstName, String lastName, String userName, String hashedPassword) {
+		try {
+			//stmt = (Statement) con.createStatement();
+			stmt.executeUpdate("INSERT INTO users VALUES(\"" + firstName + "\",\"" + lastName + "\",\"" + userName + "\",\"" + hashedPassword + "\"," + 0 + "," + 0 + ")");
+			//this.closeConnection();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public boolean userNameInUse(String proposedName) {
+		ResultSet result = null;
+		try {
+			result = stmt.executeQuery("SELECT * FROM users WHERE userName = \"" + proposedName + "\"");
+			if (result.next()) {
+				System.out.println("Line 121 in UserMySQLAccess");
+				return true;
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return false;
+	}
+
+	public void closeConnection() {
+		try {
+			con.close();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+	public int getQuizzesCreated(ResultSet set) {
+		int result = 0;
+		try {
+			while (set.next()) {
+				result = (int) set.getInt("numQuizzesCreated");
+				System.out.println("" + result); ///
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return result;
+	}
+
+	public int getQuizzesTaken(ResultSet set) {
+		int result = 0;
+		try {
+			while (set.next()) {
+				result = (int) set.getInt("numQuizzesTaken");
+				System.out.println("" + result); ///
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return result;
+	}
+
+	public boolean hasTakenPracticeQuiz(ResultSet set) {
+		boolean result = false;
+		try {
+			while (set.next()) {
+				result = set.getBoolean("tookPracticeQuiz"); // Interprets 0 as false, nonzero as true
+				System.out.println("" + result); ///
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return result;
+	}
+
+	public Statement returnStatement(){
+		Statement stmt = null;
+		try {
+			stmt = (Statement) con.createStatement();
+			stmt.executeQuery("USE " + MyDBInfo.MYSQL_DATABASE_NAME); 	
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return stmt;
+	}
+	public ResultSet returnQuizzes(){
+		ResultSet set = null;
+		try {
+			Statement stmt = (Statement) con.createStatement(); 
+			stmt.executeQuery("USE " + MyDBInfo.MYSQL_DATABASE_NAME);
+			set = stmt.executeQuery("SELECT * FROM quizzes");
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} 
+
+		return set;
+
+	}
+	public ResultSet returnQuizAttributes(String quizName){
+		ResultSet set = null;
+		try {
+			Statement stmt = (Statement) con.createStatement(); 
+			stmt.executeQuery("USE " + MyDBInfo.MYSQL_DATABASE_NAME);
+			set = stmt.executeQuery("SELECT * FROM quizzes WHERE quizName = " + "\""+quizName +"\"");
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} 
+
+		return set;
+	}
+	public ResultSet returnQuestions(String quizName){
+		ResultSet set = null;
+		try {
+			Statement stmt = (Statement) con.createStatement(); 
+			stmt.executeQuery("USE " + MyDBInfo.MYSQL_DATABASE_NAME);
+			set = stmt.executeQuery("SELECT * FROM quizItems WHERE quizName = " + "\""+quizName +"\"");
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} 
+		return set;
+	}
+	public void updateQuizzesTaken(String username, String quizName, int score){
+		try {
+			Statement stmt = (Statement) con.createStatement();
+			stmt.executeQuery("USE " + database);
+			ResultSet set = stmt.executeQuery("SELECT * FROM quizzesTaken WHERE username = \""+username+"\" AND quizName = \""+quizName+"\"");
+			if(set.next()){
+				int existingScore = set.getInt("score");
+				if(score > existingScore){
+					stmt.executeUpdate("UPDATE quizzesTaken SET score = " + score + "WHERE username = \""+username+"\" AND quizName");
+				}
+
+			}
+			else{
+				stmt.executeUpdate("INSERT INTO quizzesTaken VALUES(\"" + username+"\",\""+quizName+"\","+score+")");
+			}
+
+
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+	}
+	public ArrayList<String> getQuizHistory(String username) {
+		ResultSet set = null;
+		ArrayList<String> quizHistory = new ArrayList<String>();
+		try {
+			//stmt = (Statement) con.createStatement();
+			set = stmt.executeQuery("SELECT * FROM quizzesTaken WHERE userName = \"" + username + "\"");
+			String quiz = null;
+			while (set.next()) {
+				quiz = set.getString("quizName");
+				quizHistory.add(quiz);
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return quizHistory;
+	}
+
+	public ArrayList<String> getQuizzesCreatedHistory(String username) {
+		ResultSet set = null;
+		ArrayList<String> quizHistory = new ArrayList<String>();
+		try {
+			//stmt = (Statement) con.createStatement();
+			set = stmt.executeQuery("SELECT * FROM quizzes");
+			String quiz = null;
+			while (set.next()) {
+				quiz = set.getString("quizName");
+				quizHistory.add(quiz);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return quizHistory;
+
+	}
+
+	public void updateHasTakenPracticeQuiz(String username) {
+		ResultSet resultSet = this.getUser(username);
+		try {
+			//stmt = (Statement) con.createStatement();
+			if (hasTakenPracticeQuiz(resultSet)) {
+				stmt.executeUpdate("UPDATE users SET tookPracticeQuiz = " + true + " WHERE userName = \"" + username + "\"");
+				//TODO unlock achievement
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+
+	}
+
+
+	public boolean getAdmin(String username) {
+		ResultSet set = null;
+		boolean isAdmin = false;
+		try {
+			set = getUser(username);
+			while (set.next()) {
+				isAdmin = set.getBoolean("isAdmin");
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return isAdmin;
+	}
+
+	public int getRank(String username) {
+		ResultSet set = null;
+		int rank = 1;
+		try {
+			int numQuizzesTaken = getQuizzesTaken(getUser(username));
+			set = stmt.executeQuery("SELECT * FROM users WHERE numQuizzesTaken > " + numQuizzesTaken);
+			while (set.next()) {
+				rank++;
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return rank;
+	}
+
+	/* Formerly FriendsConnection code: */
+
+	public Set<String> getUserFriends(String name) {
+		Set<String> friendsSet = new HashSet<String>();
+		ResultSet rs = null;
+		try {
+			rs = stmt.executeQuery("SELECT * FROM friends WHERE friendOne = \"" + name + "\"");
+			String friend = "";
+			while (rs.next()) {
+				friend = (String) rs.getString("friendTwo");
+				friendsSet.add(friend);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return friendsSet;
+	}
+
+	/* Inserts a new friendship into the friends table. Represents this as one line stating that userOne is friends
+	 * with userTwo, and another line stating that userTwo is friends with userOne. Because a user cannot be friends with
+	 * himself, the total number of rows in the friends table is twice the total number of friendships.
+	 */
+	public void addFriends(String userOne, String userTwo) {
+		try {
+			//stmt = con.createStatement();
+			stmt.executeUpdate("INSERT INTO friends VALUES(\"" + userOne + "\",\"" + userTwo + "\")");
+			System.out.println("INSERT INTO users VALUES(\"" + userOne + "\",\"" + userTwo + "\")"); ///
+			stmt.executeUpdate("INSERT INTO friends VALUES(\"" + userTwo + "\",\"" + userOne + "\")");
+			System.out.println("INSERT INTO users VALUES(\"" + userTwo + "\",\"" + userOne + "\")"); ///
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+
+	/* Checks to see if two users are friends. Only checks one half of the friendship, because both should be present.
+	 */
+	public boolean areFriends(String userOne, String userTwo) {
+		ResultSet result = null;
+		try {
+			result = stmt.executeQuery("SELECT * FROM friends WHERE friendOne = \"" + userOne + "\" AND friendTwo = \"" + userTwo + "\"");
+			if (result.next()) {
+				System.out.println("Line 393 in UserMySQLAccess"); ///
+				return true;
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return false;
+	}
+
+	public int updateQuizzesTaken(String username, String quizName, int score, double timeElapsed){
+		int num = 0;
+		try {
+			Statement stmt = (Statement) con.createStatement();
+			stmt.executeQuery("USE " + database);
+			ResultSet set = stmt.executeQuery("SELECT * FROM quizzesTaken WHERE username = \""+username+"\" AND quizName = \""+quizName+"\"");
+			if(set.next()){
+				int existingScore = set.getInt("score");
+				if(score > existingScore){
+					stmt.executeUpdate("UPDATE quizzesTaken SET score = " + score + " WHERE username = \""+username+"\" AND quizName = \""+quizName+"\"");
+					stmt.executeUpdate("UPDATE quizzesTaken SET time = " + timeElapsed + " WHERE username = \""+username+"\" AND quizName = \""+quizName+"\"");
+				}
+			}
+			else{
+				stmt.executeUpdate("INSERT INTO quizzesTaken VALUES(\"" + username+"\",\""+quizName+"\","+score+","+timeElapsed+")");
+			}
+			set = stmt.executeQuery("SELECT * FROM users WHERE username = \""+username+"\"");
+			if(set.next()){
+				int numQuizzes = set.getInt("numQuizzesTaken")+1;
+				num = numQuizzes;
+				stmt.executeUpdate("UPDATE users SET numQuizzesTaken = " + numQuizzes + " WHERE username = \""+username+"\"");
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return num;
+	}
+
+	/* Updates the newsFeed table */
+	public void updateNewsfeed(String username,String type,String quiz,double time){
+		try {
+			Statement stmt = (Statement) con.createStatement();
+			stmt.executeQuery("USE " + database);
+			System.out.println("INSERT INTO newsfeed VALUES(\"" + username+"\",\""+type+"\",\""+quiz+"\","+time+")");
+			stmt.executeUpdate("INSERT INTO newsfeed VALUES(\"" + username+"\",\""+type+"\",\""+quiz+"\","+time+")");
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	public ResultSet getNewsfeed(){
+		ResultSet rs = null;
+		try {
+			Statement stmt = (Statement) con.createStatement();
+			stmt.executeQuery("USE " + database);
+			rs = stmt.executeQuery("SELECT * FROM newsfeed");
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return rs;
+	}
+	public ResultSet getMessageAttributes(String receiver){
+		ResultSet set = null;
+		try {
+			stmt = (Statement) con.createStatement(); 
+			stmt.executeQuery("USE " + MyDBInfo.MYSQL_DATABASE_NAME);
+			set = stmt.executeQuery("SELECT * FROM mailbox WHERE destination = " + "\""+receiver +"\" ORDER BY timesent DESC");
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} 
+		return set;
+	}
+
+	public void addMessage(Message message){
+		try {
+			stmt = (Statement) con.createStatement();
+			stmt.executeQuery("USE " + MyDBInfo.MYSQL_DATABASE_NAME);
+			String creator = message.getCreator();
+			String messagetext = message.getMessageText();
+			int seen = 1;
+			int sent = 1;
+			String destination = message.getDestination();
+			String messageId = message.getMessageId();
+			String messagetype = Integer.toString(message.getMessageType());
+			stmt.executeUpdate("INSERT INTO mailbox VALUES (\""+creator+"\",\""+messagetext+"\","+seen+","+sent+","+System.currentTimeMillis()+",\""+destination+"\",\""+messageId+"\",\""+messagetype+"\");"); //order matters.
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public void removeMessage(String id){
+		try {
+			stmt = (Statement) con.createStatement();
+			stmt.executeQuery("USE " + MyDBInfo.MYSQL_DATABASE_NAME);
+			ResultSet rs = stmt.executeQuery("SELECT * FROM mailbox WHERE messageId = \""+id+"\"");
+			String destination = rs.getString("destination");
+			if(destination.equals("null")){
+				stmt.executeUpdate("DELETE destination FROM mailbox WHERE messageId = \""+id+"\"");
+			}else{
+				stmt.executeUpdate("UPDATE mailbox SET destination = \"null\" WHERE messageId = \""+id+"\"");
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public String getNewMessageId(){
+//		int id = -1;
+//		try {
+//			stmt = (Statement) con.createStatement();
+//			int temp;
+//			stmt.executeQuery("USE " + MyDBInfo.MYSQL_DATABASE_NAME);
+//			ResultSet rs = stmt.executeQuery("SELECT messageId FROM mailbox ORDER BY messageId;");
+//			while(rs.next()){
+//				temp = Integer.parseInt(rs.getString("messageId"));
+//				if(id!=temp-1) return Integer.toString(id);
+//				id = temp;
+//			}
+//			return Integer.toString(id+1);
+//		} catch (SQLException e) {
+//			e.printStackTrace();
+//		}
+//		return Integer.toString(id);
+		return Long.toString(System.currentTimeMillis());
+	}
+
+	public ResultSet getIndividualAchievements(String name){
+		ResultSet set = null;
+		try {
+			stmt = (Statement) con.createStatement(); 
+			stmt.executeQuery("USE " + MyDBInfo.MYSQL_DATABASE_NAME);
+			set = stmt.executeQuery("SELECT * FROM achievements WHERE user = \""+name +"\"");
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} 
+		return set;
+	}
+
+	public ResultSet getAllAchievements(){
+		ResultSet set = null;
+		try {
+			stmt = (Statement) con.createStatement(); 
+			stmt.executeQuery("USE " + MyDBInfo.MYSQL_DATABASE_NAME);
+			set = stmt.executeQuery("SELECT * FROM achievementsDescriptions");
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} 
+		return set;
+	}
+
+	public ResultSet searchForUser(String username) {
+		ResultSet set = null;
+		try {
+			stmt = (Statement) con.createStatement();
+			stmt.executeQuery("USE " + MyDBInfo.MYSQL_DATABASE_NAME);
+			set = stmt.executeQuery("SELECT * FROM users WHERE username LIKE \"%" + username + "%\"");
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return set;
+	}
+
+	public ResultSet searchForQuiz(String quizName) {
+		ResultSet set = null;
+		try {
+			stmt = (Statement) con.createStatement();
+			stmt.executeQuery("USE " + MyDBInfo.MYSQL_DATABASE_NAME);
+			set = stmt.executeQuery("SELECT * FROM quizzes WHERE quizName LIKE \"%" + quizName + "%\"");
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return set;
+	}
+
+	public String getAchievementDescription(String achievement){
+		String description = "";
+		try{
+			stmt.executeQuery("USE " + MyDBInfo.MYSQL_DATABASE_NAME);
+			ResultSet rs = stmt.executeQuery("SELECT * FROM achievementDescriptions WHERE achievement = \"" + achievement + "\"");
+			description = rs.getString("description");
+		} catch (SQLException e){
+			e.printStackTrace();
+		}
+		return description;
+	}
+
+	public String getUserImage(String username) {
+
+		ResultSet set = null;
+		String image = "";
+		try {
+			set = getUser(username);
+			while (set.next()) {
+				image = set.getString("userImage");
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return image;
+	}
+	public ResultSet returnQuizOrder(){
+		ResultSet set = null;
+		try{
+			Statement stmt = (Statement) con.createStatement();
+			stmt.executeQuery("USE " + MyDBInfo.MYSQL_DATABASE_NAME);
+			set = stmt.executeQuery("SELECT * FROM quizzes ORDER BY timesTaken DESC");
+		} catch (SQLException e){
+			e.printStackTrace();
+		}
+		return set;
+	}
+	public ResultSet returnUserRanks(String quizName){
+		ResultSet set = null;
+		try{
+			Statement stmt = (Statement) con.createStatement();
+			stmt.executeQuery("USE " + MyDBInfo.MYSQL_DATABASE_NAME);
+			set = stmt.executeQuery("SELECT * FROM quizzesTaken WHERE quizName = \""+ quizName +"\" ORDER BY score DESC, time ASC");
+		} catch (SQLException e){
+			e.printStackTrace();
+		}
+		return set;
+	}
+}
+
+

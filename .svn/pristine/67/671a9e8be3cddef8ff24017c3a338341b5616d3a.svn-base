@@ -1,0 +1,165 @@
+package quiz;
+
+/* Discuss how achievements are represented internally. */
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
+
+public class UserProfile {
+
+	/* Instance Variables */
+
+	private String profileName;
+	//private int profileIdNumber;
+	private String password;
+	private int numQuizzesCreated;
+	private int numQuizzesTaken;
+	private Set<String> friendsSet;  //discuss how this is stored.
+	private ArrayList<String> quizzesTakenList;
+	private ArrayList<String> quizzesCreatedList;
+	private ArrayList<String> achievements;
+	private boolean topScore;
+	private boolean administrator;
+	private boolean tookPracticeQuiz;
+	private int ranking;
+	//private int totalScore;
+
+	/** Constants */
+	private final int SHORT_HISTORY = 10;
+
+	public UserProfile(String name, boolean isAdministrator){
+		profileName = name;
+		//profileIdNumber = idNumber;
+		//friendsIds = new HashSet<Integer>();
+		quizzesTakenList = new ArrayList<String>();
+		quizzesCreatedList = new ArrayList<String>();
+		achievements = new ArrayList<String>();
+		topScore = false;
+		administrator = isAdministrator;
+		ranking = 0;
+		//totalScore = 0;
+		password = "";
+	}
+
+	public UserProfile(String name, String password, int numberQuizzesCreated, int quizzesTaken, boolean practices, Set<String> friends, ArrayList<String> quizHistory, ArrayList<String> allQuizzesCreated, ArrayList<String> allAchievements, boolean isAdministrator, int rank){
+		profileName = name;
+		//profileIdNumber = idNumber;
+		this.password = hashPassword(password);
+		numQuizzesCreated = numberQuizzesCreated;
+		numQuizzesTaken = quizzesTaken;
+		tookPracticeQuiz = practices;
+		friendsSet = friends;
+		quizzesTakenList = quizHistory;
+		quizzesCreatedList = allQuizzesCreated;
+		achievements = new ArrayList<String>();
+		//achievements.addPlayerAchievement(allAchievements);
+		topScore=false;
+		administrator = isAdministrator;
+		ranking = rank;
+		//totalScore = score;
+	}
+
+	private String hashPassword(String password){
+		String hashed="";
+
+		return hashed;
+	}
+
+	public void setNewName(String name){
+		profileName = name;
+	}
+
+	public String getName(){
+		return profileName;
+	}
+	public String getPassword(){
+		return password;
+	}
+
+	public void setPassword(String password){
+		this.password = hashPassword(password);
+	}
+
+	public int getNumQuizzesCreated(){
+		return numQuizzesCreated;
+	}
+
+	public void setNumQuizzesCreated(int n){
+		numQuizzesCreated = n;
+	}
+
+	public int getNumQuizzesTaken(){
+		return numQuizzesTaken;
+	}
+
+	public void setNumQuizzesTaken(int n){
+		numQuizzesTaken = n;
+	}
+
+	public boolean getPracticeQuizTaken(){
+		return tookPracticeQuiz;
+	}
+
+	public void setTookPracticeQuiz(boolean n){
+		tookPracticeQuiz = n;
+	}
+
+	public ArrayList<String> getQuizzesTaken(){
+		return quizzesTakenList;
+	}
+
+	public ArrayList<String> getShortHistory(){
+		ArrayList<String> shortList = new ArrayList<String>();
+		int size = quizzesTakenList.size();
+		String id;
+		for(int i=0;i<SHORT_HISTORY;i++){ //10 hardcoded as a default history length.
+			id = quizzesTakenList.get(size - SHORT_HISTORY + i);
+			shortList.add(id);
+		}
+		return shortList;
+	}
+
+	public ArrayList<String> getQuizzesCreated(){
+		return quizzesCreatedList;
+	}
+
+	public void setTopScore(boolean top){
+		topScore = top;
+	}
+
+	public boolean getTopScore(){
+		return topScore;
+	}
+
+	public void addAchievement(String name){
+	//	achievements.addPlayerAchievement(name);
+	}
+
+	public void updateAchievements(){
+	//	achievements.updatePlayerAchievements(this);
+	}
+
+	//public Set<String> getAchievements(){
+	//	return achievements.getPlayerAchievements();
+	//}
+
+	public boolean promoteToAdministrator(UserProfile profile){
+		boolean success = administrator;
+		if(administrator) profile.administrator = true;
+		return success;
+	}
+
+	public void setRanking(int rank){
+		ranking = rank;
+	}
+
+	public int getRanking(){
+		return ranking;
+	}
+	
+	/* Forms the URL for a given user's profile page */
+	public static String getURL(String name) {
+		return "UserProfile.jsp?id=" + name;
+	}
+}

@@ -1,0 +1,176 @@
+package quiz;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
+
+public class UserProfile {
+	private String profileName;
+	private int profileIdNumber;
+	private String password;
+	private int numQuizzesCreated;
+	private int numQuizzesTaken;
+	private int numPracticeQuizzesTaken;
+	private Set<Integer> friendsIds;  //discuss how this is stored.
+	private ArrayList<Integer> allQuizzesTakenIds;
+	private ArrayList<Integer> quizzesCreatedIds;
+	private AchievementsList achievements;
+	private boolean topScore;
+	private boolean administrator;
+	private int ranking;
+	private int totalScore;
+	
+	public UserProfile(String name,int idNumber, boolean isAdministrator){
+		profileName = name;
+		profileIdNumber = idNumber;
+		friendsIds = new HashSet<Integer>();
+		allQuizzesTakenIds = new ArrayList<Integer>();
+		quizzesCreatedIds = new ArrayList<Integer>();
+		achievements = new AchievementsList();
+		topScore = false;
+		administrator = isAdministrator;
+		ranking = 0;
+		totalScore = 0;
+		password = "";
+	}
+	
+	public UserProfile(String name,int idNumber,String password,int numberQuizzesCreated,int quizzesTaken,int practices,Set<Integer> friends,ArrayList<Integer> quizHistory,ArrayList<Integer> allQuizzesCreated,Set<String> allAchievements,boolean isAdministrator,int rank, int score){
+		profileName = name;
+		profileIdNumber = idNumber;
+		this.password = hashPassword(password);
+		numQuizzesCreated = numberQuizzesCreated;
+		numQuizzesTaken = quizzesTaken;
+		numPracticeQuizzesTaken = practices;
+		friendsIds = friends;
+		allQuizzesTakenIds = quizHistory;
+		quizzesCreatedIds = allQuizzesCreated;
+		achievements = new AchievementsList();
+		achievements.addPlayerAchievement(allAchievements);
+		topScore=false;
+		administrator = isAdministrator;
+		ranking = rank;
+		totalScore = score;
+	}
+	
+	private String hashPassword(String password){
+		String hashed="";
+		
+		return hashed;
+	}
+	
+	public int getIdNumber(){
+		return profileIdNumber;
+	}
+	
+	public void setNewName(String name){
+		profileName = name;
+	}
+	
+	public String getName(){
+		return profileName;
+	}
+	public String getPassword(){
+		return password;
+	}
+	
+	public void setPassword(String password){
+		this.password = hashPassword(password);
+	}
+	
+	public int getNumQuizzesCreated(){
+		return numQuizzesCreated;
+	}
+	
+	public void setNumQuizzesCreated(int n){
+		numQuizzesCreated = n;
+	}
+	
+	public int getNumQuizzesTaken(){
+		return numQuizzesTaken;
+	}
+	
+	public void setNumQuizzesTaken(int n){
+		numQuizzesTaken = n;
+	}
+	
+	public int getNumPracticeQuizzesTaken(){
+		return numPracticeQuizzesTaken;
+	}
+	
+	public void setNumPracticeQuizzesTaken(int n){
+		numPracticeQuizzesTaken = n;
+	}
+	
+	public Set<Integer> getFriendsIds(){
+		return friendsIds;
+	}
+	
+	public void addFriendId(int n){
+		friendsIds.add(n);
+	}
+	
+	public ArrayList<Integer> getQuizzesTaken(){
+		return allQuizzesTakenIds;
+	}
+	
+	public ArrayList<Integer> getShortHistory(){
+		ArrayList<Integer> shortList = new ArrayList<Integer>();
+		int size = allQuizzesTakenIds.size();
+		int id;
+		for(int i=0;i<10;i++){ //10 hardcoded as a default history length.
+			id = allQuizzesTakenIds.get(size-10+i);
+			shortList.add(id);
+		}
+		return shortList;
+	}
+	
+	public ArrayList<Integer> getQuizzesCreated(){
+		return quizzesCreatedIds;
+	}
+	
+	public void setTopScore(boolean top){
+		topScore = top;
+	}
+	
+	public boolean getTopScore(){
+		return topScore;
+	}
+	
+	public void addAchievement(String name){
+		achievements.addPlayerAchievement(name);
+	}
+	
+	public void updateAchievements(){
+		achievements.updatePlayerAchievements(this);
+	}
+	
+	public Set<String> getAchievements(){
+		return achievements.getPlayerAchievements();
+	}
+	
+	public boolean promoteToAdministrator(UserProfile profile){
+		boolean success = administrator;
+		if(administrator) profile.administrator = true;
+		return success;
+	}
+	
+	public void setRanking(int rank){
+		ranking = rank;
+	}
+	
+	public int getRanking(){
+		return ranking;
+	}
+	
+	public void setTotalScore(int score){
+		totalScore = score;
+	}
+	
+	public int getTotalScore(){
+		return totalScore;
+	}
+	
+	
+	
+	
+}

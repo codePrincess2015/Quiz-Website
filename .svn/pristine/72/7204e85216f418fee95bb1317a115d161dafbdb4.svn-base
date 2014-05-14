@@ -1,0 +1,19 @@
+package quiz;
+
+import java.util.ArrayList;
+
+public class Quiz{
+	ArrayList<QuizItem> quizItems;
+	public Quiz(){
+		quizItems = new ArrayList<QuizItem>();
+	}
+	public void addQuizItem(QuizItem q){
+		quizItems.add(q);
+	}
+	public void removeQuizItem(int i){
+		quizItems.remove(i);
+	}
+	public ArrayList<QuizItem> getQuizItems(){
+		return quizItems;
+	}
+}

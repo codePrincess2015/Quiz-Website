@@ -1,0 +1,51 @@
+<%@ page import="java.sql.*,quiz.UserMySQLAccess" %>
+
+<%@ page language="java" contentType="text/html; charset=ISO-8859-1"
+    pageEncoding="ISO-8859-1"%>
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<%
+	String quizName = (String) session.getAttribute("quizName");
+	System.out.println(quizName);
+	UserMySQLAccess con = new UserMySQLAccess();
+	ResultSet rs = con.returnQuizAttributes(quizName);
+	String description = null;
+	String practice = null;
+	while (rs.next()) {
+		description = rs.getString("description");
+		practice = rs.getString("practice");
+	}
+	con.closeConnection();
+%>
+<title><%=quizName%></title>
+</head>
+<body>
+
+<h1>Quiztopia!</h1>
+<nav>
+<a href="HomePage.jsp">Home</a> |
+<a href="CreateQuiz.jsp">Create a Quiz</a> |
+<a href="QuizCatalog.jsp">All Quizzes</a> |
+<a href="UserCatalog.jsp">Users</a> |
+<a href="/jquery/">Rankings</a> |
+<a href="/">Messages</a> |
+<a href="/">My Account</a>
+</nav>
+<br><br>
+<h1><%=quizName%></h1>
+<p><%=description%></p>
+<form action="QuestionServlet" method="post">
+	<input type="submit" value="Take this Quiz!" >
+	<input type="hidden" value=<%=quizName%> name="quizName">
+	<%
+		if(practice.equals("yes")){%>
+			<br><br>
+			Take For Practice
+			<input type="checkBox" value="practice" name="practice">
+		<%}
+	%>
+</form>
+</body>
+</html>
